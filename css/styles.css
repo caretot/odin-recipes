@@ -1,0 +1,29 @@
+div {
+    background-color:cornsilk;
+    font-size: 20px;
+}
+
+h1 {
+    color: black;
+    background-color:aliceblue;
+    text-align: center;
+
+}
+
+button {
+    color: white;
+    font-size: 32px;
+}
+
+button.like-button {
+    background-color: green;
+}
+
+button.dislike-button {
+    background-color: red;
+}
+
+button.comment-button {
+    color: blue;
+}
+
