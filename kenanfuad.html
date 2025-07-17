@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Arrival Tracker - Baku GYD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '✈️';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            animation: fly 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes fly {
+            0% { transform: translateX(-50%) translateY(0px); }
+            100% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-top: 60px;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .airport-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .timezone-note {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #ffc107;
+        }
+
+        .flights-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .flight-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .flight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .flight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #0099cc);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .passenger-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .flight-route {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .airport {
+            text-align: center;
+            flex: 1;
+        }
+
+        .airport-code {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .airport-name {
+            font-size: 0.9rem;
+            color: #cccccc;
+            margin-top: 5px;
+        }
+
+        .route-arrow {
+            font-size: 2rem;
+            margin: 0 20px;
+            color: #00d4ff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .arrival-details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .arrival-time {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .arrival-date {
+            font-size: 1.2rem;
+            color: #cccccc;
+            margin-bottom: 15px;
+        }
+
+        .countdown {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .countdown-label {
+            font-size: 1rem;
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+
+        .countdown-time {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+            font-family: 'Courier New', monospace;
+        }
+
+        .countdown-time.arrived {
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .countdown-units {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .countdown-unit {
+            text-align: center;
+        }
+
+        .countdown-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .countdown-unit-label {
+            font-size: 0.8rem;
+            color: #cccccc;
+            margin-top: 5px;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff6b6b;
+            animation: blink 1s infinite;
+        }
+
+        .status-indicator.arrived {
+            background: #00ff88;
+            animation: none;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .current-time {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .live-clock {
+            font-size: 1.5rem;
+            color: #00d4ff;
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .flights-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .flight-route {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .route-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <br><h1>Flight Arrival Tracker</h1>
+        </div>
+
+        <div class="airport-info">
+            <h2>🛬 Heydar Aliyev International Airport (GYD)</h2>
+            <p>Baku, Azerbaijan</p>
+        </div>
+
+        <div class="timezone-note">
+            ⏰ All times are displayed in Baku timezone (UTC+4)
+        </div>
+
+        <div class="flights-container">
+            <div class="flight-card" id="flight-fuad">
+                <div class="status-indicator" id="status-fuad"></div>
+                <div class="passenger-name">Fuad Ildarov</div>
+                
+                <div class="flight-route">
+                    <div class="airport">
+                        <div class="airport-code">IST</div>
+                        <div class="airport-name">Istanbul</div>
+                    </div>
+                    <div class="route-arrow">→</div>
+                    <div class="airport">
+                        <div class="airport-code">GYD</div>
+                        <div class="airport-name">Baku</div>
+                    </div>
+                </div>
+
+                <div class="arrival-details">
+                    <div class="arrival-time">03:05</div>
+                    <div class="arrival-date">August 17, 2025</div>
+                </div>
+
+                <div class="countdown">
+                    <div class="countdown-label">Time until arrival:</div>
+                    <div class="countdown-time" id="countdown-fuad">Loading...</div>
+                    <div class="countdown-units">
+                        <div class="countdown-unit">
+                            <div class="countdown-number" id="days-fuad">0</div>
+                            <div class="countdown-unit-label">Days</div>
+                        </div>
+                        <div class="countdown-unit">
+                            <div class="countdown-number" id="hours-fuad">0</div>
+                            <div class="countdown-unit-label">Hours</div>
+                        </div>
+                        <div class="countdown-unit">
+                            <div class="countdown-number" id="minutes-fuad">0</div>
+                            <div class="countdown-unit-label">Minutes</div>
+                        </div>
+                        <div class="countdown-unit">
+                            <div class="countdown-number" id="seconds-fuad">0</div>
+                            <div class="countdown-unit-label">Seconds</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flight-card" id="flight-kanan">
+                <div class="status-indicator" id="status-kanan"></div>
+                <div class="passenger-name">Kanan Abdullayev</div>
+                
+                <div class="flight-route">
+                    <div class="airport">
+                        <div class="airport-code">IST</div>
+                        <div class="airport-name">Istanbul</div>
+                    </div>
+                    <div class="route-arrow">→</div>
+                    <div class="airport">
+                        <div class="airport-code">GYD</div>
+                        <div class="airport-name">Baku</div>
+                    </div>
+                </div>
+
+                <div class="arrival-details">
+                    <div class="arrival-time">16:35</div>
+                    <div class="arrival-date">August 13, 2025</div>
+                </div>
+
+                <div class="countdown">
+                    <div class="countdown-label">Time until arrival:</div>
+                    <div class="countdown-time" id="countdown-kanan">Loading...</div>
+                    <div class="countdown-units">
+                        <div class="countdown-unit">
+                            <div class="countdown-number" id="days-kanan">0</div>
+                            <div class="countdown-unit-label">Days</div>
+                        </div>
+                        <div class="countdown-unit">
+                            <div class="countdown-number" id="hours-kanan">0</div>
+                            <div class="countdown-unit-label">Hours</div>
+                        </div>
+                        <div class="countdown-unit">
+                            <div class="countdown-number" id="minutes-kanan">0</div>
+                            <div class="countdown-unit-label">Minutes</div>
+                        </div>
+                        <div class="countdown-unit">
+                            <div class="countdown-number" id="seconds-kanan">0</div>
+                            <div class="countdown-unit-label">Seconds</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="current-time">
+            <div>Current Time (Baku):</div><br>
+            <div class="live-clock" id="current-time">Loading...</div>
+        </div><br>
+    </div>
+
+    <script>
+        // Flight arrival times in Baku timezone (UTC+4)
+        const flights = {
+            fuad: new Date('2025-08-17T03:05:00+04:00'),
+            kanan: new Date('2025-08-13T16:35:00+04:00')
+        };
+
+        function updateCountdown() {
+            const now = new Date();
+            
+            // Update current time display
+            const currentTimeElement = document.getElementById('current-time');
+            const bakuTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Baku"}));
+            currentTimeElement.textContent = bakuTime.toLocaleString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            // Update countdowns for each flight
+            Object.keys(flights).forEach(passenger => {
+                const arrivalTime = flights[passenger];
+                const timeDiff = arrivalTime - now;
+                
+                const countdownElement = document.getElementById(`countdown-${passenger}`);
+                const statusElement = document.getElementById(`status-${passenger}`);
+                const daysElement = document.getElementById(`days-${passenger}`);
+                const hoursElement = document.getElementById(`hours-${passenger}`);
+                const minutesElement = document.getElementById(`minutes-${passenger}`);
+                const secondsElement = document.getElementById(`seconds-${passenger}`);
+
+                if (timeDiff > 0) {
+                    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+                    countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    countdownElement.className = 'countdown-time';
+                    statusElement.className = 'status-indicator';
+                    
+                    daysElement.textContent = days;
+                    hoursElement.textContent = hours;
+                    minutesElement.textContent = minutes;
+                    secondsElement.textContent = seconds;
+                } else {
+                    countdownElement.textContent = 'ARRIVED! 🎉';
+                    countdownElement.className = 'countdown-time arrived';
+                    statusElement.className = 'status-indicator arrived';
+                    
+                    daysElement.textContent = '0';
+                    hoursElement.textContent = '0';
+                    minutesElement.textContent = '0';
+                    secondsElement.textContent = '0';
+                }
+            });
+        }
+
+        // Update countdown immediately and then every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // Add some interactive effects
+        document.querySelectorAll('.flight-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
